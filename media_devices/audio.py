@@ -20,7 +20,7 @@ class Audio:
 
                 if event.t == "new":
                     source = await pulse.source_output_info(event.index)
-                    self.sources[event.index] = source
+                    self.sources[event.index] = source.proplist["application.name"]
                     _LOGGER.debug(
                         "Started listening: %s", source.proplist["application.name"]
                     )
@@ -29,10 +29,10 @@ class Audio:
                     source = self.sources[event.index]
                     del self.sources[event.index]
                     _LOGGER.debug(
-                        "Stopped listening: %s", source.proplist["application.name"]
+                        "Stopped listening: %s", source
                     )
 
     async def _get_sources(self, pulse):
         sources = await pulse.source_output_list()
         for source in sources:
-            self.sources[source.index] = source
+            self.sources[source.index] = source.proplist["application.name"]
