@@ -7,8 +7,8 @@ name = "pypi"
 pulsectl-asyncio="==0.1.5"
 
 [dev-packages]
-#black="*"
-isort="*"
+black="==21.5b1"
+isort="==5.8.0"
 
 [requires]
 python_version = "3.9"
