@@ -4,7 +4,7 @@ import pulsectl_asyncio
 
 
 class Microphone:
-    APP_NAME = "event-listener"
+    APP_NAME = "call_watcher"
 
     def __init__(self):
         self._users = {}
@@ -12,6 +12,7 @@ class Microphone:
     async def users(self):
         async with pulsectl_asyncio.PulseAsync(self.APP_NAME) as pulse:
             await self._get_sources(pulse)
+
             async for event in pulse.subscribe_events("source_output"):
                 if event.t not in ["new", "remove"]:
                     continue
