@@ -18,19 +18,21 @@ def setup_logger():
     root.addHandler(handler)
 
 
+async def report_mic_users():
+    audio = Audio()
+    async for users in audio.mic_users():
+        print(users)
+
+
 async def main():
     setup_logger()
 
-    audio = Audio()
-    listen_task = asyncio.create_task(audio.listen())
-
-    # register signal handlers to cancel listener when program is asked to terminate
+    mic_users_task = asyncio.create_task(report_mic_users())
     for sig in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT):
-        loop.add_signal_handler(sig, listen_task.cancel)
-    # Alternatively, the PulseAudio event subscription can be ended by breaking/returning from the `async for` loop
+        loop.add_signal_handler(sig, mic_users_task.cancel)
 
     with suppress(asyncio.CancelledError):
-        await listen_task
+        await mic_users_task
 
 
 if __name__ == "__main__":

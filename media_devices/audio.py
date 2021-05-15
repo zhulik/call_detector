@@ -1,4 +1,5 @@
 import logging
+from copy import deepcopy
 
 import pulsectl_asyncio
 
@@ -9,9 +10,9 @@ class Audio:
     APP_NAME = "event-listener"
 
     def __init__(self):
-        self.sources = {}
+        self._sources = {}
 
-    async def listen(self):
+    async def mic_users(self):
         async with pulsectl_asyncio.PulseAsync(self.APP_NAME) as pulse:
             await self._get_sources(pulse)
             async for event in pulse.subscribe_events("source_output"):
@@ -20,19 +21,18 @@ class Audio:
 
                 if event.t == "new":
                     source = await pulse.source_output_info(event.index)
-                    self.sources[event.index] = source.proplist["application.name"]
+                    self._sources[event.index] = source.proplist["application.name"]
                     _LOGGER.debug(
                         "Started listening: %s", source.proplist["application.name"]
                     )
 
                 if event.t == "remove":
-                    source = self.sources[event.index]
-                    del self.sources[event.index]
-                    _LOGGER.debug(
-                        "Stopped listening: %s", source
-                    )
+                    source = self._sources[event.index]
+                    del self._sources[event.index]
+                    _LOGGER.debug("Stopped listening: %s", source)
+                yield deepcopy(list(self._sources.values()))
 
     async def _get_sources(self, pulse):
         sources = await pulse.source_output_list()
         for source in sources:
-            self.sources[source.index] = source.proplist["application.name"]
+            self._sources[source.index] = source.proplist["application.name"]
