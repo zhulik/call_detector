@@ -2,8 +2,6 @@ import logging
 
 import pulsectl_asyncio
 
-_LOGGER = logging.getLogger(__name__)
-
 
 class Audio:
     APP_NAME = "event-listener"
@@ -21,14 +19,10 @@ class Audio:
                 if event.t == "new":
                     source = await pulse.source_output_info(event.index)
                     self._users[event.index] = source.proplist["application.name"]
-                    _LOGGER.debug(
-                        "Started listening: %s", source.proplist["application.name"]
-                    )
 
                 if event.t == "remove":
                     source = self._users[event.index]
                     del self._users[event.index]
-                    _LOGGER.debug("Stopped listening: %s", source)
                 yield list(self._users.values())
 
     async def _get_sources(self, pulse):

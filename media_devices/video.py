@@ -1,6 +1,5 @@
 import asyncio
 import glob
-import logging
 import os
 from copy import deepcopy
 from dataclasses import dataclass
@@ -8,8 +7,6 @@ from os.path import join
 from pathlib import Path
 
 PROC_PATH = "/proc"
-
-_LOGGER = logging.getLogger(__name__)
 
 
 def lsof(filename):
@@ -44,10 +41,8 @@ class Video:
     async def users(self):
         self._users = await camera_readers()
         while True:
-            _LOGGER.debug("Polling...")
             users = await camera_readers()
             if users != self._users:
                 self._users = users
                 yield deepcopy(self._users)
-            _LOGGER.debug("Polling finished..")
             await asyncio.sleep(5)
