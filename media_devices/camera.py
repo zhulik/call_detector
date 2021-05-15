@@ -29,7 +29,7 @@ def lsof(filename):
     return list(result)
 
 
-async def camera_readers():
+async def camera_users():
     result = []
     for filename in glob.glob("/dev/video*"):
         result += lsof(filename)
@@ -41,7 +41,7 @@ class Camera:
         self._users = []
 
     async def users(self):
-        self._users = await camera_readers()
+        self._users = await camera_users()
         self._cameras = glob.glob("/dev/video*")
 
         with Inotify(blocking=False) as inotify:
@@ -49,8 +49,7 @@ class Camera:
                 inotify.add_watch(camera, Mask.OPEN | Mask.CLOSE)
 
             async for event in inotify:
-                users = await camera_readers()
+                users = await camera_users()
                 if users != self._users:
                     self._users = users
                     yield deepcopy(self._users)
-                await asyncio.sleep(5)
