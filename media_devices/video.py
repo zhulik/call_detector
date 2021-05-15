@@ -30,7 +30,7 @@ def lsof(filename):
     return list(result)
 
 
-def camera_readers():
+async def camera_readers():
     result = []
     for filename in glob.glob("/dev/video*"):
         result += lsof(filename)
@@ -42,10 +42,12 @@ class Video:
         self._users = []
 
     async def users(self):
-        self._users = camera_readers()
+        self._users = await camera_readers()
         while True:
-            users = camera_readers()
+            _LOGGER.debug("Polling...")
+            users = await camera_readers()
             if users != self._users:
                 self._users = users
                 yield deepcopy(self._users)
+            _LOGGER.debug("Polling finished..")
             await asyncio.sleep(5)

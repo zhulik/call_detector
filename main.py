@@ -42,8 +42,8 @@ async def main():
         loop.add_signal_handler(sig, cam_users_task.cancel)
 
     with suppress(asyncio.CancelledError):
-        await mic_users_task
         await cam_users_task
+        await mic_users_task
 
 
 if __name__ == "__main__":
