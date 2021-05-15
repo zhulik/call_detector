@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from os.path import join
 from pathlib import Path
 
+from minotaur import Inotify, Mask
+
 PROC_PATH = "/proc"
 
 
@@ -40,9 +42,15 @@ class Camera:
 
     async def users(self):
         self._users = await camera_readers()
-        while True:
-            users = await camera_readers()
-            if users != self._users:
-                self._users = users
-                yield deepcopy(self._users)
-            await asyncio.sleep(5)
+        self._cameras = glob.glob("/dev/video*")
+
+        with Inotify(blocking=False) as inotify:
+            for camera in self._cameras:
+                inotify.add_watch(camera, Mask.OPEN | Mask.CLOSE)
+
+            async for event in inotify:
+                users = await camera_readers()
+                if users != self._users:
+                    self._users = users
+                    yield deepcopy(self._users)
+                await asyncio.sleep(5)

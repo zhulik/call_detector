@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 pulsectl-asyncio="==0.1.5"
+hbmqtt="==0.9.6"
+minotaur="==0.0.4"
 
 [dev-packages]
 black="==21.5b1"
