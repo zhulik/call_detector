@@ -1,5 +1,6 @@
-import pulsectl_asyncio
 import logging
+
+import pulsectl_asyncio
 
 _LOGGER = logging.getLogger(__name__)
 

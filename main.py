@@ -1,10 +1,11 @@
 import asyncio
-import signal
-from contextlib import suppress
 import logging
+import signal
 import sys
+from contextlib import suppress
 
 from media_devices.audio import Audio
+
 
 def setup_logger():
   root = logging.getLogger()
