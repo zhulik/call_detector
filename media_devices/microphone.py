@@ -3,7 +3,7 @@ import logging
 import pulsectl_asyncio
 
 
-class Audio:
+class Microphone:
     APP_NAME = "event-listener"
 
     def __init__(self):

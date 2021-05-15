@@ -34,7 +34,7 @@ async def camera_readers():
     return list(set(result))
 
 
-class Video:
+class Camera:
     def __init__(self):
         self._users = []
 

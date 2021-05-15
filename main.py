@@ -4,18 +4,18 @@ import signal
 import sys
 from contextlib import suppress
 
-from media_devices.audio import Audio
-from media_devices.video import Video
+from media_devices.camera import Camera
+from media_devices.microphone import Microphone
 
 
 async def report_mic_users():
-    audio = Audio()
+    audio = Microphone()
     async for users in audio.users():
         print("Audio:", users)
 
 
 async def report_cam_users():
-    video = Video()
+    video = Camera()
     async for users in video.users():
         print("Camera:", users)
 
