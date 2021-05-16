@@ -37,12 +37,13 @@ async def camera_users():
 
 
 class Camera:
-    def __init__(self):
+    def __init__(self, queue):
         self._users = []
+        self._queue = queue
 
-    async def users(self):
+    async def run(self):
         self._users = await camera_users()
-        yield deepcopy(self._users)
+        await self._publish()
         self._cameras = glob.glob("/dev/video*")
 
         with Inotify(blocking=False) as inotify:
@@ -53,4 +54,12 @@ class Camera:
                 users = await camera_users()
                 if users != self._users:
                     self._users = users
-                    yield deepcopy(self._users)
+                    await self._publish()
+
+    async def _publish(self):
+        await self._queue.put(
+            {
+                "type": "camera",
+                "apps": deepcopy(self._users),
+            }
+        )

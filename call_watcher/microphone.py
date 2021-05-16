@@ -6,13 +6,14 @@ import pulsectl_asyncio
 class Microphone:
     APP_NAME = "call_watcher"
 
-    def __init__(self):
+    def __init__(self, queue):
         self._users = {}
+        self._queue = queue
 
-    async def users(self):
+    async def run(self):
         async with pulsectl_asyncio.PulseAsync(self.APP_NAME) as pulse:
             await self._get_sources(pulse)
-            yield list(self._users.values())
+            await self._publish()
 
             async for event in pulse.subscribe_events("source_output"):
                 if event.t not in ["new", "remove"]:
@@ -25,7 +26,16 @@ class Microphone:
                 if event.t == "remove":
                     source = self._users[event.index]
                     del self._users[event.index]
-                yield list(self._users.values())
+
+                await self._publish()
+
+    async def _publish(self):
+        await self._queue.put(
+            {
+                "type": "microphone",
+                "apps": list(self._users.values()),
+            }
+        )
 
     async def _get_sources(self, pulse):
         sources = await pulse.source_output_list()
