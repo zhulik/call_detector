@@ -12,6 +12,7 @@ class Microphone:
     async def users(self):
         async with pulsectl_asyncio.PulseAsync(self.APP_NAME) as pulse:
             await self._get_sources(pulse)
+            yield list(self._users.values())
 
             async for event in pulse.subscribe_events("source_output"):
                 if event.t not in ["new", "remove"]:

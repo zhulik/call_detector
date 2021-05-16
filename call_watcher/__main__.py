@@ -28,7 +28,6 @@ async def main():
     username = os.environ["MQTT_USERNAME"]
     password = os.environ["MQTT_PASSWORD"]
     publisher = MQTTPublisher(host, port, username, password)
-    await publisher.connect()
     mic_users_task = asyncio.create_task(report_mic_users(publisher))
     cam_users_task = asyncio.create_task(report_cam_users(publisher))
 

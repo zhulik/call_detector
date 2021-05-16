@@ -42,6 +42,7 @@ class Camera:
 
     async def users(self):
         self._users = await camera_users()
+        yield deepcopy(self._users)
         self._cameras = glob.glob("/dev/video*")
 
         with Inotify(blocking=False) as inotify:
