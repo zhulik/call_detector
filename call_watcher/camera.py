@@ -8,6 +8,8 @@ from pathlib import Path
 
 from minotaur import Inotify, Mask
 
+from .timer import timer
+
 PROC_PATH = "/proc"
 
 
@@ -45,6 +47,7 @@ class Camera:
         self._users = await camera_users()
         await self._publish()
         self._cameras = glob.glob("/dev/video*")
+        asyncio.create_task(timer(self._publish, 60))
 
         with Inotify(blocking=False) as inotify:
             for camera in self._cameras:
