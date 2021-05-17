@@ -9,7 +9,7 @@ from call_watcher.publishers import MQTTPublisher
 
 
 def setup_logger(level):
-    root = logging.getLogger()
+    root = logging.getLogger("call_watcher")
     root.setLevel(level)
     handler = logging.StreamHandler(sys.stdout)
     handler.setLevel(level)
@@ -24,7 +24,7 @@ async def main():
     username = os.environ.get("MQTT_USERNAME", None)
     password = os.environ.get("MQTT_PASSWORD", None)
 
-    setup_logger(logging.WARN)
+    setup_logger(logging.DEBUG)
 
     queue = asyncio.Queue()
 
