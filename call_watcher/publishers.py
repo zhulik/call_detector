@@ -1,10 +1,13 @@
 import asyncio
 import json
-import traceback
+import logging
 import socket
+import traceback
 
 from gmqtt import Client as MQTTClient
 from gmqtt.mqtt.constants import MQTTv311
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class MQTTPublisher:

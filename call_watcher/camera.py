@@ -1,5 +1,6 @@
 import asyncio
 import glob
+import logging
 import os
 from copy import deepcopy
 from dataclasses import dataclass
@@ -11,6 +12,8 @@ from minotaur import Inotify, Mask
 from .timer import timer
 
 PROC_PATH = "/proc"
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def lsof(filename):
@@ -44,8 +47,11 @@ class Camera:
         self._queue = queue
 
     async def run(self):
+        _LOGGER.info("Running.")
         self._users = await camera_users()
         await self._publish()
+
+        # TODO: detect new cameras
         self._cameras = glob.glob("/dev/video*")
         asyncio.create_task(timer(self._publish, 60))
 
