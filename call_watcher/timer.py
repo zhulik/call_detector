@@ -1,12 +1,14 @@
 import asyncio
-import traceback
+import logging
+
+_LOGGER = logging.getLogger(__name__)
 
 
 async def timer(func, sleep_time):
     while True:
         try:
             await func()
-        except Exception as err:  # pylint: disable=broad-except
-            traceback.print_tb(err.__traceback__)
+        except Exception:  # pylint: disable=broad-except
+            _LOGGER.exception("Error occured during timer execution")
         finally:
             await asyncio.sleep(sleep_time)

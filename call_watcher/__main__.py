@@ -42,7 +42,7 @@ async def main():
     cam_users_task = asyncio.create_task(camera.run())
     publisher_task = asyncio.create_task(publisher.run())
 
-    await asyncio.wait([cam_users_task, mic_users_task, publisher_task])
+    await asyncio.gather(cam_users_task, mic_users_task, publisher_task)
 
 
 if __name__ == "__main__":

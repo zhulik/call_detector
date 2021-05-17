@@ -2,7 +2,6 @@ import asyncio
 import json
 import logging
 import socket
-import traceback
 
 from gmqtt import Client as MQTTClient
 from gmqtt.mqtt.constants import MQTTv311
@@ -42,8 +41,8 @@ class MQTTPublisher:
                     json.dumps(msg["data"]),
                     qos=1,
                 )
-            except Exception as err:  # pylint: disable=broad-except
-                traceback.print_tb(err.__traceback__)
+            except Exception:  # pylint: disable=broad-except
+                _LOGGER.exception("Error occured during timer execution")
                 self._connected = False
                 await asyncio.sleep(5)
 
