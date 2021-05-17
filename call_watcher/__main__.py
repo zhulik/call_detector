@@ -1,9 +1,7 @@
 import asyncio
 import logging
 import os
-import signal
 import sys
-from contextlib import suppress
 
 from call_watcher.camera import Camera
 from call_watcher.microphone import Microphone

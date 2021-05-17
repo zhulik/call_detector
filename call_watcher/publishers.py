@@ -11,7 +11,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class MQTTPublisher:
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         queue,
         host="localhost",
@@ -42,7 +42,7 @@ class MQTTPublisher:
                     json.dumps(msg["data"]),
                     qos=1,
                 )
-            except Exception as err:
+            except Exception as err:  # pylint: disable=broad-except
                 traceback.print_tb(err.__traceback__)
                 self._connected = False
                 await asyncio.sleep(5)
@@ -51,7 +51,5 @@ class MQTTPublisher:
         if self._connected:
             return
 
-        await self._client.connect(
-            self._host, port=self._port, ssl=True, version=MQTTv311
-        )
+        await self._client.connect(self._host, port=self._port, ssl=True, version=MQTTv311)
         self._connected = True
