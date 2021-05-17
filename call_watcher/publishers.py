@@ -30,19 +30,16 @@ class MQTTPublisher:
         self._connected = False
 
     async def run(self):
+        _LOGGER.info("Running.")
+
         while True:
             try:
                 msg = await self._queue.get()
                 await self._connect()
 
                 self._client.publish(
-                    f"{self._topic}/{msg['type']}",
-                    json.dumps(
-                        {
-                            "count": len(msg["apps"]),
-                            "apps": msg["apps"],
-                        }
-                    ),
+                    f"{self._topic}/{msg['source']}",
+                    json.dumps(msg["data"]),
                     qos=1,
                 )
             except Exception as err:

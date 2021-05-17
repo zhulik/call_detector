@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from copy import deepcopy
 
 import pulsectl_asyncio
 
@@ -17,6 +18,7 @@ class Microphone:
 
     async def run(self):
         _LOGGER.info("Running.")
+
         async with pulsectl_asyncio.PulseAsync(self.APP_NAME) as pulse:
             await self._get_sources(pulse)
             await self._publish()
@@ -39,8 +41,11 @@ class Microphone:
     async def _publish(self):
         await self._queue.put(
             {
-                "type": "microphone",
-                "apps": list(self._users.values()),
+                "source": "microphone",
+                "data": {
+                    "count": len(self._users),
+                    "apps": deepcopy(list(self._users.values())),
+                },
             }
         )
 

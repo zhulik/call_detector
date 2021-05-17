@@ -48,6 +48,7 @@ class Camera:
 
     async def run(self):
         _LOGGER.info("Running.")
+
         self._users = await camera_users()
         await self._publish()
 
@@ -68,7 +69,10 @@ class Camera:
     async def _publish(self):
         await self._queue.put(
             {
-                "type": "camera",
-                "apps": deepcopy(self._users),
+                "source": "camera",
+                "data": {
+                    "count": len(self._users),
+                    "apps": deepcopy(self._users),
+                },
             }
         )
