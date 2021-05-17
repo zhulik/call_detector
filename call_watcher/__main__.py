@@ -24,7 +24,7 @@ async def main():
     username = os.environ.get("MQTT_USERNAME", None)
     password = os.environ.get("MQTT_PASSWORD", None)
 
-    setup_logger(logging.DEBUG)
+    setup_logger(logging.WARN)
 
     queue = asyncio.Queue()
 
@@ -35,6 +35,7 @@ async def main():
         port=port,
         username=username,
         password=password,
+        ssl=True,
         queue=queue,
     )
 

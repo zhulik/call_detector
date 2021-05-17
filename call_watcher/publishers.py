@@ -17,14 +17,17 @@ class MQTTPublisher:
         port=8333,
         username=None,
         password=None,
+        ssl=False,
         topic=f"call_watcher/{socket.gethostname()}",
     ):
         self._client = MQTTClient("call_watcher")
-        self._client.set_auth_credentials(username, password)
+        if username is not None:
+            self._client.set_auth_credentials(username, password)
         self._host = host
         self._port = port
         self._queue = queue
         self._topic = topic
+        self._ssl = ssl
 
         self._connected = False
 
@@ -50,5 +53,5 @@ class MQTTPublisher:
         if self._connected:
             return
 
-        await self._client.connect(self._host, port=self._port, ssl=True, version=MQTTv311)
+        await self._client.connect(self._host, port=self._port, ssl=self._ssl, version=MQTTv311)
         self._connected = True
