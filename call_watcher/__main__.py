@@ -38,11 +38,7 @@ async def main():
         queue=queue,
     )
 
-    mic_users_task = asyncio.create_task(microphone.run())
-    cam_users_task = asyncio.create_task(camera.run())
-    publisher_task = asyncio.create_task(publisher.run())
-
-    await asyncio.gather(cam_users_task, mic_users_task, publisher_task)
+    await asyncio.gather(microphone.run(), camera.run(), publisher.run())
 
 
 if __name__ == "__main__":
