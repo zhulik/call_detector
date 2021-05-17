@@ -23,16 +23,22 @@ async def report_cam_users():
 
 
 async def main():
-    host = os.environ["MQTT_HOST"]
+    host = os.environ.get("MQTT_HOST", "localhost")
     port = int(os.environ.get("MQTT_PORT", 8883))
-    username = os.environ["MQTT_USERNAME"]
-    password = os.environ["MQTT_PASSWORD"]
+    username = os.environ.get("MQTT_USERNAME", None)
+    password = os.environ.get("MQTT_PASSWORD", None)
 
     queue = asyncio.Queue()
 
     microphone = Microphone(queue)
     camera = Camera(queue)
-    publisher = MQTTPublisher(host, port, username, password, queue)
+    publisher = MQTTPublisher(
+        host=host,
+        port=port,
+        username=username,
+        password=password,
+        queue=queue,
+    )
 
     mic_users_task = asyncio.create_task(microphone.run())
     cam_users_task = asyncio.create_task(camera.run())

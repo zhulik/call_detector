@@ -1,18 +1,28 @@
 import asyncio
 import json
 import traceback
+import socket
 
 from gmqtt import Client as MQTTClient
 from gmqtt.mqtt.constants import MQTTv311
 
 
 class MQTTPublisher:
-    def __init__(self, host, port, username, password, queue):
+    def __init__(
+        self,
+        queue,
+        host="localhost",
+        port=8333,
+        username=None,
+        password=None,
+        topic=f"call_watcher/{socket.gethostname()}",
+    ):
         self._client = MQTTClient("call_watcher")
         self._client.set_auth_credentials(username, password)
         self._host = host
         self._port = port
         self._queue = queue
+        self._topic = topic
 
         self._connected = False
 
@@ -23,7 +33,7 @@ class MQTTPublisher:
                 await self._connect()
 
                 self._client.publish(
-                    f"call_watcher/{msg['type']}",
+                    f"{self._topic}/{msg['type']}",
                     json.dumps(
                         {
                             "count": len(msg["apps"]),
