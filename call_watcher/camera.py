@@ -3,7 +3,6 @@ import glob
 import logging
 import os
 from copy import deepcopy
-from dataclasses import dataclass
 from os.path import join
 from pathlib import Path
 
@@ -19,7 +18,7 @@ _LOGGER = logging.getLogger(__name__)
 def lsof(filename):
     pids = [int(name) for name in os.listdir(PROC_PATH) if name.isnumeric()]
     result = set()
-    for pid in pids:
+    for pid in pids:  # pylint: disable=too-many-nested-blocks
         try:
             p_path = join(PROC_PATH, str(pid))
             fd_path = join(p_path, "fd")
@@ -45,6 +44,7 @@ class Camera:
     def __init__(self, queue):
         self._users = []
         self._queue = queue
+        self._cameras = glob.glob("/dev/video*")
 
     async def run(self):
         _LOGGER.info("Running.")
@@ -53,14 +53,13 @@ class Camera:
         await self._publish()
 
         # TODO: detect new cameras
-        self._cameras = glob.glob("/dev/video*")
         asyncio.create_task(timer(self._publish, 60))
 
         with Inotify(blocking=False) as inotify:
             for camera in self._cameras:
                 inotify.add_watch(camera, Mask.OPEN | Mask.CLOSE)
 
-            async for event in inotify:
+            async for _ in inotify:
                 users = await camera_users()
                 if users != self._users:
                     self._users = users
