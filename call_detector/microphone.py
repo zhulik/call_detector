@@ -6,18 +6,18 @@ import pulsectl_asyncio
 
 from .timer import timer
 
-_LOGGER = logging.getLogger(__name__)
-
 
 class Microphone:
     APP_NAME = "call_detector"
+
+    _LOGGER = logging.getLogger(f"{__name__}.{__qualname__}")
 
     def __init__(self, queue):
         self._users = {}
         self._queue = queue
 
     async def run(self):
-        _LOGGER.info("Running.")
+        self._LOGGER.info("Running.")
 
         async with pulsectl_asyncio.PulseAsync(self.APP_NAME) as pulse:
             await self._get_sources(pulse)
@@ -42,10 +42,7 @@ class Microphone:
         await self._queue.put(
             {
                 "source": "microphone",
-                "data": {
-                    "count": len(self._users),
-                    "apps": deepcopy(list(self._users.values())),
-                },
+                "apps": deepcopy(list(self._users.values())),
             }
         )
 

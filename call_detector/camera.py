@@ -12,8 +12,6 @@ from .timer import timer
 
 PROC_PATH = "/proc"
 
-_LOGGER = logging.getLogger(__name__)
-
 
 def lsof(filename):
     pids = [int(name) for name in os.listdir(PROC_PATH) if name.isnumeric()]
@@ -41,13 +39,15 @@ async def camera_users():
 
 
 class Camera:
+    _LOGGER = logging.getLogger(f"{__name__}.{__qualname__}")
+
     def __init__(self, queue):
         self._users = []
         self._queue = queue
         self._cameras = glob.glob("/dev/video*")
 
     async def run(self):
-        _LOGGER.info("Running.")
+        self._LOGGER.info("Running.")
 
         self._users = await camera_users()
         await self._publish()
@@ -69,9 +69,6 @@ class Camera:
         await self._queue.put(
             {
                 "source": "camera",
-                "data": {
-                    "count": len(self._users),
-                    "apps": deepcopy(self._users),
-                },
+                "apps": deepcopy(self._users),
             }
         )

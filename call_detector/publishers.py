@@ -6,10 +6,10 @@ import socket
 from gmqtt import Client as MQTTClient
 from gmqtt.mqtt.constants import MQTTv311
 
-_LOGGER = logging.getLogger(__name__)
-
 
 class MQTTPublisher:  # pylint: disable=too-many-instance-attributes
+    _LOGGER = logging.getLogger(f"{__name__}.{__qualname__}")
+
     def __init__(  # pylint: disable=too-many-arguments
         self,
         queue,
@@ -34,7 +34,7 @@ class MQTTPublisher:  # pylint: disable=too-many-instance-attributes
         self._connected = False
 
     async def run(self):
-        _LOGGER.info("Running.")
+        self._LOGGER.info("Running.")
 
         while True:
             try:
@@ -49,7 +49,7 @@ class MQTTPublisher:  # pylint: disable=too-many-instance-attributes
             except Exception:  # pylint: disable=broad-except
                 if not self._retry:
                     raise
-                _LOGGER.exception("Error occured during timer execution")
+                self._LOGGER.exception("Error occured during timer execution")
                 self._connected = False
                 await asyncio.sleep(5)
 
