@@ -5,13 +5,13 @@ import sys
 
 import click
 
-from call_watcher.camera import Camera
-from call_watcher.microphone import Microphone
-from call_watcher.publishers import MQTTPublisher
+from .camera import Camera
+from .microphone import Microphone
+from .publishers import MQTTPublisher
 
 
 def setup_logger(level):
-    root = logging.getLogger("call_watcher")
+    root = logging.getLogger("call_detector")
     root.setLevel(level)
     handler = logging.StreamHandler(sys.stdout)
     handler.setLevel(level)

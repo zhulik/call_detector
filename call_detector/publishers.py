@@ -19,9 +19,9 @@ class MQTTPublisher:  # pylint: disable=too-many-instance-attributes
         password=None,
         ssl=False,
         retry=False,
-        topic=f"call_watcher/{socket.gethostname()}",
+        topic=f"call_detector/{socket.gethostname()}",
     ):
-        self._client = MQTTClient("call_watcher")
+        self._client = MQTTClient("call_detector")
         if username is not None:
             self._client.set_auth_credentials(username, password)
         self._host = host
