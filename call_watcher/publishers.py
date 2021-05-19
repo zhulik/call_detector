@@ -9,7 +9,7 @@ from gmqtt.mqtt.constants import MQTTv311
 _LOGGER = logging.getLogger(__name__)
 
 
-class MQTTPublisher:
+class MQTTPublisher:  # pylint: disable=too-many-instance-attributes
     def __init__(  # pylint: disable=too-many-arguments
         self,
         queue,
@@ -18,6 +18,7 @@ class MQTTPublisher:
         username=None,
         password=None,
         ssl=False,
+        retry=False,
         topic=f"call_watcher/{socket.gethostname()}",
     ):
         self._client = MQTTClient("call_watcher")
@@ -27,6 +28,7 @@ class MQTTPublisher:
         self._port = port
         self._queue = queue
         self._topic = topic
+        self._retry = retry
         self._ssl = ssl
 
         self._connected = False
@@ -45,6 +47,8 @@ class MQTTPublisher:
                     qos=1,
                 )
             except Exception:  # pylint: disable=broad-except
+                if not self._retry:
+                    raise
                 _LOGGER.exception("Error occured during timer execution")
                 self._connected = False
                 await asyncio.sleep(5)

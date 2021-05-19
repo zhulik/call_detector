@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "eedb85450ed6310a9fecd540595c76ae752e0c317f01ba7984697953c37189ad"
+            "sha256": "f82079776620dbd76565c26f011689b7fc68f1a89e264776d8981570f3d1049d"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,14 @@
         ]
     },
     "default": {
+        "click": {
+            "hashes": [
+                "sha256:7d8c289ee437bcb0316820ccee14aefcb056e58d31830ecab8e47eda6540e136",
+                "sha256:e90e62ced43dc8105fb9a26d62f0d9340b5c8db053a814e25d95c19873ae87db"
+            ],
+            "index": "pypi",
+            "version": "==8.0.0"
+        },
         "gmqtt": {
             "hashes": [
                 "sha256:0e98a964393834e724c93b5dce9524c9f1255c338c0d972188794f54c6559f04",
@@ -104,7 +112,7 @@
                 "sha256:7d8c289ee437bcb0316820ccee14aefcb056e58d31830ecab8e47eda6540e136",
                 "sha256:e90e62ced43dc8105fb9a26d62f0d9340b5c8db053a814e25d95c19873ae87db"
             ],
-            "markers": "python_version >= '3.6'",
+            "index": "pypi",
             "version": "==8.0.0"
         },
         "flake8": {
