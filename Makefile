@@ -14,6 +14,6 @@ flake8:
 	pipenv run flake8 .
 
 pylint:
-	pipenv run pylint call_watcher
+	pipenv run pylint call_detector
 
 .PHONY: black isort flake8 pylint lint format

@@ -10,7 +10,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class Microphone:
-    APP_NAME = "call_watcher"
+    APP_NAME = "call_detector"
 
     def __init__(self, queue):
         self._users = {}
