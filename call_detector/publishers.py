@@ -2,14 +2,38 @@ import asyncio
 import json
 import logging
 import socket
+from functools import reduce
 
 from gmqtt import Client as MQTTClient
 from gmqtt.mqtt.constants import MQTTv311
 
-_LOGGER = logging.getLogger(__name__)
+
+def throttle(seconds):
+    class Throttler:
+        def __init__(self, seconds, func):
+            self._seconds = seconds
+            self._func = func
+            self._task = None
+
+        async def func(self, obj):
+            if self._task is None:
+                self._task = asyncio.create_task(self._delayed_call(obj))
+
+        async def _delayed_call(self, obj):
+            await asyncio.sleep(self._seconds)
+            await self._func(obj)
+            self._task = None
+
+    def decorator(func):
+        throttler = Throttler(seconds, func)
+        return lambda obj: throttler.func(obj)  # pylint: disable=unnecessary-lambda
+
+    return decorator
 
 
 class MQTTPublisher:  # pylint: disable=too-many-instance-attributes
+    _LOGGER = logging.getLogger(f"{__name__}.{__qualname__}")
+
     def __init__(  # pylint: disable=too-many-arguments
         self,
         queue,
@@ -33,23 +57,23 @@ class MQTTPublisher:  # pylint: disable=too-many-instance-attributes
 
         self._connected = False
 
+        self._state = {"call": False}
+
     async def run(self):
-        _LOGGER.info("Running.")
+        self._LOGGER.info("Running.")
 
         while True:
             try:
                 msg = await self._queue.get()
                 await self._connect()
 
-                self._client.publish(
-                    f"{self._topic}/{msg['source']}",
-                    json.dumps(msg["data"]),
-                    qos=1,
-                )
+                self._update_state(msg)
+
+                await self._publish_state()
             except Exception:  # pylint: disable=broad-except
                 if not self._retry:
                     raise
-                _LOGGER.exception("Error occured during timer execution")
+                self._LOGGER.exception("Error occured during timer execution")
                 self._connected = False
                 await asyncio.sleep(5)
 
@@ -59,3 +83,21 @@ class MQTTPublisher:  # pylint: disable=too-many-instance-attributes
 
         await self._client.connect(self._host, port=self._port, ssl=self._ssl, version=MQTTv311)
         self._connected = True
+
+    def _update_state(self, msg):
+        del self._state["call"]
+        self._state[msg["source"]] = msg["apps"]
+
+        apps = reduce(lambda a, b: a + len(b), self._state.values(), 0)
+        self._state["call"] = apps > 0
+
+        self._LOGGER.info("State updated: %s", self._state)
+
+    @throttle(0.5)
+    async def _publish_state(self):
+        self._LOGGER.info("Publishing state %s to topic %s", self._state, self._topic)
+        self._client.publish(
+            self._topic,
+            json.dumps(self._state),
+            qos=1,
+        )
