@@ -8,7 +8,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="call_detector",
-    version="0.1.2",
+    version="0.1.3",
     author="Gleb Sinyavskiy",
     author_email="zhulik.gleb@gmail.com",
     description="Detects if the user is an online call, publishes gathered information to an MQTT broker",
