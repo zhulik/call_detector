@@ -1,8 +1,8 @@
 import asyncio
 import getpass
 import logging
-import sys
 import socket
+import sys
 
 import click
 
@@ -34,6 +34,16 @@ def setup_logger(level):
 def main(
     host, username, password, port, ssl, retry, ask_password, verbose, topic
 ):  # pylint: disable=too-many-arguments
+    """
+    call_detector listens to microphone and camera states to detect
+    if the user is participating in an online call.
+
+    Publishes gathered information to an MQTT broker.
+
+    Example:
+
+    call_detector -H mqtt.example.com -U user -P password
+    """
     if verbose:
         loglevel = logging.DEBUG
     else:

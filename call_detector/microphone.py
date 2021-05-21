@@ -30,7 +30,7 @@ class Microphone:
 
                 if event.t == "new":
                     source = await pulse.source_output_info(event.index)
-                    self._users[event.index] = source.proplist["application.name"]
+                    self._users[event.index] = source.proplist["application.process.binary"]
 
                 if event.t == "remove":
                     source = self._users[event.index]
@@ -49,4 +49,4 @@ class Microphone:
     async def _get_sources(self, pulse):
         sources = await pulse.source_output_list()
         for source in sources:
-            self._users[source.index] = source.proplist["application.name"]
+            self._users[source.index] = source.proplist["application.process.binary"]
