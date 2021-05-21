@@ -5,7 +5,9 @@ Publishes gathered information to an MQTT broker.
 
 ## Where it works
 
-It works only on linux(at the current moment). I don't have plans to add support for other operating systems.
+It works only on linux, I don't have plans to support other operating systems. If you're interested, feel free to open a PR.
+
+In order to use _call_detector_ you'll need pulseaudio or pipewire-pulse and libpulse.
 
 ## How it works
 
