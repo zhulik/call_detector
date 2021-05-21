@@ -1,33 +1,35 @@
 # call_detector
 
 _call_detector_ listens to microphone and camera states to detect if the user is participating in an online call.
-Publishes gathered information to an MQTT broker.
+Gathered information is being published to an MQTT broker.
 
 ## Where it works
 
-It works only on linux, I don't have plans to support other operating systems. If you're interested, feel free to open a PR.
+Currently only Linux is supported, I don't have plans to support other operating systems.
+If you're interested, feel free to open a PR.
 
-In order to use _call_detector_ you'll need pulseaudio or pipewire-pulse and libpulse.
+In order to use _call_detector_ you'll need `pulseaudio` or `pipewire-pulse` and `libpulse`.
 
 ## How it works
 
-_call_detector_ listens to pulseadio events to detect the app which uses the microphone and uses inotify with
-some /proc magic to detect the app which uses the camera.
+_call_detector_ listens to pulseadio events to detect apps which use the microphone and uses inotify with
+some /proc magic to find apps which use the camera.
 
 ## MQTT
 
-_call_detector_ was only tested against [mosquitto](https://mosquitto.org/) MQTT broker with login/password authentication and TLS enabled, however in therory it can work without TLS and authentication and agains any broker supported by
+_call_detector_ was only tested against [mosquitto](https://mosquitto.org/) MQTT broker with login/password authentication and TLS
+enabled, however in therory it can work without TLS and authentication and against any broker supported by
 [gmqtt](https://github.com/wialon/gmqtt).
 
-Every time the _call_detector_ detects a new camera or microphone user it publishes a message to a topic named like
-`call_detector/<hostname>` where hostname is the hostname of the machine where you run _call_detector_. Also it sends a message
-on start and every minute.
+Every time the _call_detector_ detects an app which starts or stops using the microphone or the camera,
+it publishes a message to an MQTT topic with name of the format `call_detector/<hostname>` where hostname is the hostname
+of the machine where you run _call_detector_. Also it sends a message on start and every minute.
 
 Message examples:
 
-`{"camera": [], "microphone": [], "call": true}` when camera and microphone are not active.
+`{"camera": [], "microphone": [], "call": false}` when camera and microphone are not active.
 
-`{"camera": ["firefox"], "microphone": ["firefox"], "call": false}` when user is in an online call using firefox.
+`{"camera": ["firefox"], "microphone": ["firefox"], "call": true}` when user is in an online call using firefox.
 
 ## Installation
 
