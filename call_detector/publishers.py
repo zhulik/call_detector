@@ -4,8 +4,11 @@ import logging
 import socket
 from functools import reduce
 
+import async_timeout
 from gmqtt import Client as MQTTClient
 from gmqtt.mqtt.constants import MQTTv311
+
+from . import UPDATE_INTERVAL
 
 
 def throttle(seconds):
@@ -66,8 +69,12 @@ class MQTTPublisher:  # pylint: disable=too-many-instance-attributes
 
         while True:
             try:
-                msg = await self._queue.get()
-                self._update_state(msg)
+                try:
+                    with async_timeout.timeout(UPDATE_INTERVAL):
+                        msg = await self._queue.get()
+                        self._update_state(msg)
+                except asyncio.exceptions.TimeoutError:
+                    pass
 
                 await self._publish_state()
             except Exception:  # pylint: disable=broad-except

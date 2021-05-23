@@ -21,6 +21,7 @@ setup(
         "gmqtt>=0.6.9",
         "minotaur>=0.0.4",
         "click>=8.0.0",
+        "async-timeout>=3.0.1",
     ],
     entry_points={"console_scripts": ["call_detector=call_detector.__main__:main"]},
     packages=["call_detector"],
