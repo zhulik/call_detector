@@ -48,6 +48,7 @@ class MQTTPublisher:  # pylint: disable=too-many-instance-attributes
         self._client = MQTTClient("call_detector")
         if username is not None:
             self._client.set_auth_credentials(username, password)
+
         self._host = host
         self._port = port
         self._queue = queue
@@ -55,18 +56,17 @@ class MQTTPublisher:  # pylint: disable=too-many-instance-attributes
         self._retry = retry
         self._ssl = ssl
 
-        self._connected = False
-
         self._state = {"call": False}
 
     async def run(self):
         self._LOGGER.info("Running.")
 
+        await self._client.connect(self._host, port=self._port, ssl=self._ssl, version=MQTTv311, keepalive=10)
+        self._LOGGER.info("Connected.")
+
         while True:
             try:
                 msg = await self._queue.get()
-                await self._connect()
-
                 self._update_state(msg)
 
                 await self._publish_state()
@@ -74,15 +74,7 @@ class MQTTPublisher:  # pylint: disable=too-many-instance-attributes
                 if not self._retry:
                     raise
                 self._LOGGER.exception("Error occured during timer execution")
-                self._connected = False
                 await asyncio.sleep(5)
-
-    async def _connect(self):
-        if self._connected:
-            return
-
-        await self._client.connect(self._host, port=self._port, ssl=self._ssl, version=MQTTv311)
-        self._connected = True
 
     def _update_state(self, msg):
         del self._state["call"]

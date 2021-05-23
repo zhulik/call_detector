@@ -8,6 +8,7 @@ from pathlib import Path
 
 from minotaur import Inotify, Mask
 
+from . import UPDATE_INTERVAL
 from .timer import timer
 
 PROC_PATH = "/proc"
@@ -53,7 +54,7 @@ class Camera:
         await self._publish()
 
         # TODO: detect new cameras
-        asyncio.create_task(timer(self._publish, 60))
+        asyncio.create_task(timer(self._publish, UPDATE_INTERVAL))
 
         with Inotify(blocking=False) as inotify:
             for camera in self._cameras:
