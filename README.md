@@ -57,6 +57,7 @@ binary_sensor:
     value_template: "{{ 'ON' if value_json.call else 'OFF' }}"
     json_attributes_topic: "call_detector/<hostname>" # same as state_topic
     json_attributes_template: "{{ value_json | tojson }}"
+    qos: 1
 ```
 
 Automation example:
