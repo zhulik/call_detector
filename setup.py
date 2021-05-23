@@ -8,7 +8,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="call_detector",
-    version="0.1.3",
+    version="0.2.0",
     author="Gleb Sinyavskiy",
     author_email="zhulik.gleb@gmail.com",
     description="Detects if the user is an online call, publishes gathered information to an MQTT broker",
@@ -21,6 +21,7 @@ setup(
         "gmqtt>=0.6.9",
         "minotaur>=0.0.4",
         "click>=8.0.0",
+        "async-timeout>=3.0.1",
     ],
     entry_points={"console_scripts": ["call_detector=call_detector.__main__:main"]},
     packages=["call_detector"],

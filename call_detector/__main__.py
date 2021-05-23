@@ -30,7 +30,7 @@ def setup_logger(level):
 @click.option("-s", "--ssl", is_flag=True, default=True, help="Use SSL")
 @click.option("-a", "--ask-password", is_flag=True, help="Read password from stdin")
 @click.option("-v", "--verbose", is_flag=True, help="Verbose output")
-@click.option("-r", "--retry/--no-retry", is_flag=True, default=False, help="Keep retrying if can't connect")
+@click.option("-r", "--retry/--no-retry", is_flag=True, default=True, help="Keep retrying if can't connect")
 def main(
     host, username, password, port, ssl, retry, ask_password, verbose, topic
 ):  # pylint: disable=too-many-arguments

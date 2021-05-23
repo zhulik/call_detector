@@ -1,4 +1,3 @@
-import asyncio
 import glob
 import logging
 import os
@@ -7,8 +6,6 @@ from os.path import join
 from pathlib import Path
 
 from minotaur import Inotify, Mask
-
-from .timer import timer
 
 PROC_PATH = "/proc"
 
@@ -49,11 +46,9 @@ class Camera:
     async def run(self):
         self._LOGGER.info("Running.")
 
+        # TODO: detect new cameras
         self._users = await camera_users()
         await self._publish()
-
-        # TODO: detect new cameras
-        asyncio.create_task(timer(self._publish, 60))
 
         with Inotify(blocking=False) as inotify:
             for camera in self._cameras:

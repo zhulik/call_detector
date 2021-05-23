@@ -1,10 +1,7 @@
-import asyncio
 import logging
 from copy import deepcopy
 
 import pulsectl_asyncio
-
-from .timer import timer
 
 
 class Microphone:
@@ -22,7 +19,6 @@ class Microphone:
         async with pulsectl_asyncio.PulseAsync(self.APP_NAME) as pulse:
             await self._get_sources(pulse)
             await self._publish()
-            asyncio.create_task(timer(self._publish, 60))
 
             async for event in pulse.subscribe_events("source_output"):
                 if event.t not in ["new", "remove"]:

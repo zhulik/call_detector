@@ -4,6 +4,7 @@ import logging
 import socket
 from functools import reduce
 
+import async_timeout
 from gmqtt import Client as MQTTClient
 from gmqtt.mqtt.constants import MQTTv311
 
@@ -32,7 +33,9 @@ def throttle(seconds):
 
 
 class MQTTPublisher:  # pylint: disable=too-many-instance-attributes
+    _APP_NAME = "call_detector"
     _LOGGER = logging.getLogger(f"{__name__}.{__qualname__}")
+    _UPDATE_INTERVAL = 60
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
@@ -45,9 +48,10 @@ class MQTTPublisher:  # pylint: disable=too-many-instance-attributes
         retry=False,
         topic=f"call_detector/{socket.gethostname()}",
     ):
-        self._client = MQTTClient("call_detector")
+        self._client = MQTTClient(self._APP_NAME)
         if username is not None:
             self._client.set_auth_credentials(username, password)
+
         self._host = host
         self._port = port
         self._queue = queue
@@ -55,34 +59,29 @@ class MQTTPublisher:  # pylint: disable=too-many-instance-attributes
         self._retry = retry
         self._ssl = ssl
 
-        self._connected = False
-
         self._state = {"call": False}
 
     async def run(self):
         self._LOGGER.info("Running.")
 
+        await self._client.connect(self._host, port=self._port, ssl=self._ssl, version=MQTTv311, keepalive=10)
+        self._LOGGER.info("Connected.")
+
         while True:
             try:
-                msg = await self._queue.get()
-                await self._connect()
-
-                self._update_state(msg)
+                try:
+                    with async_timeout.timeout(self._UPDATE_INTERVAL):
+                        msg = await self._queue.get()
+                        self._update_state(msg)
+                except asyncio.exceptions.TimeoutError:
+                    pass
 
                 await self._publish_state()
             except Exception:  # pylint: disable=broad-except
                 if not self._retry:
                     raise
                 self._LOGGER.exception("Error occured during timer execution")
-                self._connected = False
                 await asyncio.sleep(5)
-
-    async def _connect(self):
-        if self._connected:
-            return
-
-        await self._client.connect(self._host, port=self._port, ssl=self._ssl, version=MQTTv311)
-        self._connected = True
 
     def _update_state(self, msg):
         del self._state["call"]
