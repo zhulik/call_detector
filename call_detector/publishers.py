@@ -8,8 +8,6 @@ import async_timeout
 from gmqtt import Client as MQTTClient
 from gmqtt.mqtt.constants import MQTTv311
 
-from . import UPDATE_INTERVAL
-
 
 def throttle(seconds):
     class Throttler:
@@ -35,7 +33,9 @@ def throttle(seconds):
 
 
 class MQTTPublisher:  # pylint: disable=too-many-instance-attributes
+    _APP_NAME = "call_detector"
     _LOGGER = logging.getLogger(f"{__name__}.{__qualname__}")
+    _UPDATE_INTERVAL = 60
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
@@ -48,7 +48,7 @@ class MQTTPublisher:  # pylint: disable=too-many-instance-attributes
         retry=False,
         topic=f"call_detector/{socket.gethostname()}",
     ):
-        self._client = MQTTClient("call_detector")
+        self._client = MQTTClient(self._APP_NAME)
         if username is not None:
             self._client.set_auth_credentials(username, password)
 
@@ -70,7 +70,7 @@ class MQTTPublisher:  # pylint: disable=too-many-instance-attributes
         while True:
             try:
                 try:
-                    with async_timeout.timeout(UPDATE_INTERVAL):
+                    with async_timeout.timeout(self._UPDATE_INTERVAL):
                         msg = await self._queue.get()
                         self._update_state(msg)
                 except asyncio.exceptions.TimeoutError:
