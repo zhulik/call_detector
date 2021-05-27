@@ -64,8 +64,16 @@ class MQTTPublisher:  # pylint: disable=too-many-instance-attributes
     async def run(self):
         self._LOGGER.info("Running.")
 
-        await self._client.connect(self._host, port=self._port, ssl=self._ssl, version=MQTTv311, keepalive=10)
-        self._LOGGER.info("Connected.")
+        while True:
+            try:
+                await self._client.connect(self._host, port=self._port, ssl=self._ssl, version=MQTTv311, keepalive=10)
+                self._LOGGER.info("Connected.")
+                break
+            except Exception:  # pylint: disable=broad-except
+                if not self._retry:
+                    raise
+                self._LOGGER.exception("Error occured during connecting")
+                await asyncio.sleep(5)
 
         while True:
             try:
@@ -80,7 +88,7 @@ class MQTTPublisher:  # pylint: disable=too-many-instance-attributes
             except Exception:  # pylint: disable=broad-except
                 if not self._retry:
                     raise
-                self._LOGGER.exception("Error occured during timer execution")
+                self._LOGGER.exception("Error occured during publishing")
                 await asyncio.sleep(5)
 
     def _update_state(self, msg):
