@@ -7,6 +7,8 @@ import pulsectl_asyncio
 class Microphone:
     APP_NAME = "call_detector"
 
+    IGNORED_APPS = ["plasmashell"]
+
     _LOGGER = logging.getLogger(f"{__name__}.{__qualname__}")
 
     def __init__(self, queue):
@@ -38,7 +40,7 @@ class Microphone:
         await self._queue.put(
             {
                 "source": "microphone",
-                "apps": deepcopy(list(self._users.values())),
+                "apps": self._apps_to_publish(),
             }
         )
 
@@ -46,3 +48,10 @@ class Microphone:
         sources = await pulse.source_output_list()
         for source in sources:
             self._users[source.index] = source.proplist["application.process.binary"]
+
+    def _apps_to_publish(self):
+        apps = deepcopy(list(self._users.values()))
+        for app in self.IGNORED_APPS:
+            if app in apps:
+                apps.remove(app)
+        return apps
