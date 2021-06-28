@@ -50,7 +50,7 @@ class Microphone:
             self._users[source.index] = source.proplist["application.process.binary"]
 
     def _apps_to_publish(self):
-        apps = deepcopy(list(self._users.values()))
+        apps = list(set(deepcopy(list(self._users.values()))))
         for app in self.IGNORED_APPS:
             if app in apps:
                 apps.remove(app)
